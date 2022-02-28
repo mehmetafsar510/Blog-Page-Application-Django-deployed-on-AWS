@@ -142,17 +142,30 @@ LOGIN_REDIRECT_URL = "blog:list"
 
 LOGIN_URL = "login"
 
-
-AWS_STORAGE_BUCKET_NAME = 'capstone-django' # please enter your s3 bucket name
-AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-AWS_S3_REGION_NAME = 'us-east-1' # please enter your s3 region 
-AWS_DEFAULT_ACL = 'public-read'
-
 AWS_LOCATION = 'static'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
-
+AWS_S3_CUSTOM_DOMAIN = 'd2hozixcpfrpox.cloudfront.net'
 STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 DEFAULT_FILE_STORAGE = 'cblog.storages.MediaStore'
+
+AWS_STORAGE_BUCKET_NAME = 'capstone-django'
+AWS_S3_OBJECT_PARAMETERS = {
+    'CacheControl': 'max-age=86400',
+}
+
+#AWS_STORAGE_BUCKET_NAME = 'capstone-django' # please enter your s3 bucket name
+#AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+#AWS_S3_REGION_NAME = 'us-east-1' # please enter your s3 region 
+#AWS_DEFAULT_ACL = 'public-read'
+
+#AWS_LOCATION = 'static'
+#STATICFILES_DIRS = [
+#    os.path.join(BASE_DIR, 'static'),
+#]
+
+#STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#DEFAULT_FILE_STORAGE = 'cblog.storages.MediaStore'
