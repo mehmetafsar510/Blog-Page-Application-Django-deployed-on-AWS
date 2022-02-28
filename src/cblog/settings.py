@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'cblog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'database1', # database name in RDS is written here
-        'USER': 'admin', # database master username in RDS is written here
+        'NAME': 'database name in RDS is written here', # database name in RDS is written here
+        'USER': 'database master username in RDS is written here', # database master username in RDS is written here
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'capstone.c9txddhkxqrn.us-east-1.rds.amazonaws.com',  # database endpoint is written here
-        'PORT': '3306' # database port is written here
+        'HOST': 'database endpoint is written here',  # database endpoint is written here
+        'PORT': 'database port is written here' # database port is written here
     }
 }
 
@@ -140,8 +140,8 @@ LOGIN_URL = "login"
 
 AWS_STATIC_LOCATION = 'static'
 
-AWS_STORAGE_BUCKET_NAME = 'capstone-django'
-AWS_S3_CUSTOM_DOMAIN = 'd2hozixcpfrpox.cloudfront.net'
+AWS_STORAGE_BUCKET_NAME = 'please enter your s3 bucket name'
+AWS_S3_CUSTOM_DOMAIN = 'please enter your s3 cloudfront'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
@@ -170,7 +170,7 @@ STATICFILES_DIRS = [
 ]
 #AWS_STORAGE_BUCKET_NAME = 'capstone-django' # please enter your s3 bucket name
 #AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
-#AWS_S3_REGION_NAME = 'us-east-1' # please enter your s3 region 
+#AWS_S3_REGION_NAME = 'please enter your s3 region' # please enter your s3 region 
 #AWS_DEFAULT_ACL = 'public-read'
 
 #AWS_LOCATION = 'static'
