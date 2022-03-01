@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'cblog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'database name in RDS is written here', # database name in RDS is written here
-        'USER': 'database master username in RDS is written here', # database master username in RDS is written here
+        'NAME': 'database1', # database name in RDS is written here
+        'USER': 'admin', # database master username in RDS is written here
         'PASSWORD': config('PASSWORD'),
-        'HOST': 'database endpoint is written here',  # database endpoint is written here
-        'PORT': 'database port is written here' # database port is written here
+        'HOST': 'capstone.c9txddhkxqrn.us-east-1.rds.amazonaws.com',  # database endpoint is written here
+        'PORT': '3306' # database port is written here
     }
 }
 
@@ -140,7 +140,7 @@ LOGIN_URL = "login"
 
 AWS_STATIC_LOCATION = 'static'
 
-AWS_STORAGE_BUCKET_NAME = 'please enter your s3 bucket name'
+AWS_STORAGE_BUCKET_NAME = 'capstone-django'
 AWS_S3_CUSTOM_DOMAIN = 'please enter your s3 cloudfront'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
