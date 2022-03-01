@@ -141,7 +141,7 @@ LOGIN_URL = "login"
 AWS_STATIC_LOCATION = 'static'
 
 AWS_STORAGE_BUCKET_NAME = 'capstone-django'
-AWS_S3_CUSTOM_DOMAIN = 'please enter your s3 cloudfront'
+AWS_S3_CUSTOM_DOMAIN = 'd2hozixcpfrpox.cloudfront.net'
 AWS_S3_OBJECT_PARAMETERS = {
     'CacheControl': 'max-age=86400',
 }
