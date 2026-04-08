@@ -153,7 +153,7 @@ AWS_PUBLIC_MEDIA_LOCATION = 'media/public'
 DEFAULT_FILE_STORAGE = 'cblog.storages.PublicMediaStorage'
 
 
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_PUBLIC_MEDIA_LOCATION)
 
 
 # These directories comes from Dockerfile
