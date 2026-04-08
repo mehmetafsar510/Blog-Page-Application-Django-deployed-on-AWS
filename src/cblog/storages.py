@@ -9,5 +9,5 @@ from .settings import *
 class PublicMediaStorage(S3Boto3Storage):
     location = AWS_PUBLIC_MEDIA_LOCATION
     file_overwrite = False
-    default_acl = 'public-read'
+    default_acl = None
 
