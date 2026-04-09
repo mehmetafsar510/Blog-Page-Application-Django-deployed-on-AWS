@@ -9,6 +9,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.db.models.functions import Coalesce
+from django.db.models import F
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -43,12 +45,13 @@ def post_list(request):
     published_filter = Q(status='p') & (
         Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
     )
+    order_by_field = Coalesce('published_date', 'publish_date').desc()
     if request.user.is_authenticated:
         qs = Post.objects.filter(
             published_filter | Q(author=request.user)
-        ).distinct().order_by('-published_date')
+        ).distinct().order_by(order_by_field)
     else:
-        qs = Post.objects.filter(published_filter).order_by('-published_date')
+        qs = Post.objects.filter(published_filter).order_by(order_by_field)
     search_form = SearchForm(request.GET or None)
     category = request.GET.get('category')
     tag = request.GET.get('tag')
