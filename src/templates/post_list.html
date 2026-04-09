@@ -141,6 +141,48 @@
                 </div>
             </div>
 
+            <!-- Newsletter Signup Widget -->
+            <div class="card shadow mb-4" id="newsletter-signup">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-envelope-open-text"></i> Join Our Newsletter</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Subscribe to our weekly newsletter for new posts, author highlights, and publishing tips.</p>
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ newsletter_form.email }}
+                        </div>
+                        <button type="submit" name="newsletter_subscribe" class="btn btn-info btn-block">Subscribe</button>
+                    </form>
+                    <small class="form-text text-muted">Join {{ subscriber_count }} readers and never miss a story.</small>
+                </div>
+            </div>
+
+            <!-- Author Spotlight Widget -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-edit"></i> Author Spotlight</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for author in top_authors %}
+                        <li class="list-group-item">
+                            <div class="d-flex align-items-center">
+                                <img src="{{ author.profile.image.url }}" class="rounded-circle mr-3" alt="{{ author.username }}" style="width: 40px; height: 40px; object-fit: cover;">
+                                <div>
+                                    <a href="{% url 'author-profile' author.username %}">{{ author.get_full_name|default:author.username }}</a>
+                                    <div class="text-muted small">{{ author.post_count }} posts · {{ author.profile.follower_count }} followers</div>
+                                </div>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No active authors yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
             <!-- Categories Widget -->
             <div class="card shadow mb-4">
                 <div class="card-header bg-success text-white">

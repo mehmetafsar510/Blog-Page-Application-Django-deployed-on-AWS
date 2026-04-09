@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import fields
-from .models import Post, Comment, Tag
+from .models import Post, Comment, Tag, NewsletterSubscriber
 
 
 class SearchForm(forms.Form):
@@ -56,3 +56,19 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ('content',)
+
+
+class NewsletterSubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ('email',)
+        widgets = {
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter your email',
+                'autocomplete': 'email'
+            })
+        }
+        labels = {
+            'email': 'Email Address'
+        }

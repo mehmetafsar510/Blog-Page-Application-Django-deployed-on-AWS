@@ -1,7 +1,10 @@
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Post, Like, PostView, Tag
-from .forms import CommentForm, PostForm, SearchForm
+from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.mail import send_mail
+from .models import Post, Like, PostView, Tag, NewsletterSubscriber
+from .forms import CommentForm, PostForm, SearchForm, NewsletterSubscriptionForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -11,6 +14,27 @@ from django.utils.text import slugify
 
 
 def post_list(request):
+    newsletter_form = NewsletterSubscriptionForm(request.POST or None)
+    if request.method == "POST" and 'newsletter_subscribe' in request.POST:
+        if newsletter_form.is_valid():
+            email = newsletter_form.cleaned_data['email'].strip().lower()
+            subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+            if created:
+                try:
+                    send_mail(
+                        subject="Welcome to the Clarusway Blog Newsletter",
+                        message="Thank you for subscribing to our newsletter. You'll receive the latest blog updates, author features, and publishing insights.",
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[subscriber.email],
+                        fail_silently=False,
+                    )
+                    messages.success(request, "Subscribed successfully! A welcome email is on its way.")
+                except Exception:
+                    messages.success(request, "Subscribed successfully! We were unable to send the welcome email due to mail settings.")
+            else:
+                messages.info(request, "You are already subscribed to the newsletter.")
+            return redirect('blog:list')
+    
     qs = Post.objects.filter(status='p').filter(
         Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
     ).order_by('-published_date')
@@ -48,6 +72,14 @@ def post_list(request):
         view_count=Count('postview')
     ).order_by('-view_count')[:5]
     
+    # Top authors spotlight
+    top_authors = User.objects.annotate(
+        post_count=Count('post', filter=Q(post__status='p')),
+        follower_count=Count('profile__followers', distinct=True)
+    ).filter(post_count__gt=0).order_by('-follower_count', '-post_count')[:3]
+    
+    subscriber_count = NewsletterSubscriber.objects.count()
+    
     context = {
         "object_list": page_obj,
         "search_form": search_form,
@@ -55,6 +87,9 @@ def post_list(request):
         "selected_tag": tag,
         "recent_posts": recent_posts,
         "popular_posts": popular_posts,
+        "top_authors": top_authors,
+        "newsletter_form": newsletter_form,
+        "subscriber_count": subscriber_count,
     }
     return render(request, "blog/post_list.html", context)
 
@@ -93,23 +128,22 @@ def post_create(request):
 
 
 def post_detail(request, slug):
-    # print(request.get_host())
-    # print(slug)
-    # Post.objects.get(slug=learn-drf-3c78be2186)
-    # slug = learn-drf-3c78be2186
     form = CommentForm()
     obj = get_object_or_404(Post, slug=slug)
     if request.user.is_authenticated:
         PostView.objects.create(user=request.user, post=obj)
     if request.method == "POST":
-        form = CommentForm(request.POST)
-        if form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.post = obj
-            comment.save()
-            return redirect("blog:detail", slug=slug)
-            # return redirect(request.path)
+        if request.user.is_authenticated:
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = request.user
+                comment.post = obj
+                comment.save()
+                return redirect("blog:detail", slug=slug)
+        else:
+            messages.warning(request, "Please login to leave a comment.")
+            return redirect('login')
     context = {
         "object": obj,
         "form": form
