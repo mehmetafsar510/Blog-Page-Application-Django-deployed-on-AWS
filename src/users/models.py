@@ -11,6 +11,11 @@ class Profile(models.Model):
     image = models.ImageField(
         upload_to=user_profile_path, default="avatar.png")
     bio = models.TextField(blank=True)
+    followers = models.ManyToManyField(User, blank=True, related_name='following', symmetrical=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return "{} {}".format(self.user, 'Profile')
+    
+    def follower_count(self):
+        return self.followers.count()

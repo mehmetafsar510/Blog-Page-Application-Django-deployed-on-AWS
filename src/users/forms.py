@@ -5,6 +5,16 @@ from django.forms import fields
 from .models import Profile
 
 
+class ContactForm(forms.Form):
+    name = forms.CharField(max_length=100)
+    email = forms.EmailField()
+    subject = forms.CharField(max_length=100)
+    message = forms.CharField(widget=forms.Textarea)
+    
+    class Meta:
+        fields = ('name', 'email', 'subject', 'message')
+
+
 class RegistrationForm(UserCreationForm):
     email = forms.EmailField()
 

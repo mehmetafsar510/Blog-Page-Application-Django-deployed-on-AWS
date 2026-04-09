@@ -1,15 +1,46 @@
 # from django.http.response import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Post, Like, PostView
-from .forms import CommentForm, PostForm
+from .models import Post, Like, PostView, Tag
+from .forms import CommentForm, PostForm, SearchForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 
 def post_list(request):
-    qs = Post.objects.filter(status='p')
+    qs = Post.objects.filter(status='p').order_by('-publish_date')
+    search_form = SearchForm(request.GET or None)
+    category = request.GET.get('category')
+    tag = request.GET.get('tag')
+    
+    # Category filter
+    if category:
+        qs = qs.filter(category=category)
+    
+    # Tag filter
+    if tag:
+        qs = qs.filter(tags__name=tag)
+    
+    # Search query
+    if search_form.is_valid() and search_form.cleaned_data.get('query'):
+        query = search_form.cleaned_data['query']
+        qs = qs.filter(Q(title__icontains=query) | Q(content__icontains=query))
+    
+    # Pagination
+    paginator = Paginator(qs, 5)  # 5 posts per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Recent posts (sidebar widget)
+    recent_posts = Post.objects.filter(status='p').order_by('-publish_date')[:5]
+    
     context = {
-        "object_list": qs
+        "object_list": page_obj,
+        "search_form": search_form,
+        "selected_category": category,
+        "selected_tag": tag,
+        "recent_posts": recent_posts,
     }
     return render(request, "blog/post_list.html", context)
 
