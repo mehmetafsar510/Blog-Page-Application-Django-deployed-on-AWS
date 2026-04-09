@@ -5,7 +5,7 @@ from .forms import CommentForm, PostForm, SearchForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q, Count
 
 
 def post_list(request):
@@ -35,8 +35,10 @@ def post_list(request):
     # Recent posts (sidebar widget)
     recent_posts = Post.objects.filter(status='p').order_by('-publish_date')[:5]
     
-    # Popular posts (sidebar widget)
-    popular_posts = Post.objects.filter(status='p').order_by('-view_count')[:5]
+    # Popular posts (sidebar widget) - annotate view count
+    popular_posts = Post.objects.filter(status='p').annotate(
+        view_count=Count('postview')
+    ).order_by('-view_count')[:5]
     
     context = {
         "object_list": page_obj,
