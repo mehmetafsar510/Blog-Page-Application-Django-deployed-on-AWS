@@ -40,9 +40,15 @@ def post_list(request):
                 for error in errors:
                     messages.error(request, f"{error}")
     
-    qs = Post.objects.filter(status='p').filter(
+    published_filter = Q(status='p') & (
         Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
-    ).order_by('-published_date')
+    )
+    if request.user.is_authenticated:
+        qs = Post.objects.filter(
+            published_filter | Q(author=request.user)
+        ).distinct().order_by('-published_date')
+    else:
+        qs = Post.objects.filter(published_filter).order_by('-published_date')
     search_form = SearchForm(request.GET or None)
     category = request.GET.get('category')
     tag = request.GET.get('tag')

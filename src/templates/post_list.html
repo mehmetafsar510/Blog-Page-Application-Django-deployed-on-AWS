@@ -40,7 +40,10 @@
                             </div>
                             <div class="col-md-8">
                                 <div class="card-body">
-                                    <h5 class="card-title"><a href="{% url 'blog:detail' obj.slug %}">{{obj.title}}</a></h5>
+                                    <h5 class="card-title">
+                                        <a href="{% url 'blog:detail' obj.slug %}">{{obj.title}}</a>
+                                        {% if obj.status == 'd' %}<span class="badge badge-warning ml-1">Draft</span>{% endif %}
+                                    </h5>
                                     <p class="card-text">{{obj.content|truncatechars:100}}</p>
                                     
                                     <!-- Tags -->
