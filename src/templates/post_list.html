@@ -148,12 +148,17 @@
                 </div>
                 <div class="card-body">
                     <p class="mb-3">Subscribe to our weekly newsletter for new posts, author highlights, and publishing tips.</p>
-                    <form method="post" action="">
+                    <form method="post" action="{% url 'blog:list' %}#newsletter-signup">
                         {% csrf_token %}
                         <div class="form-group">
                             {{ newsletter_form.email }}
+                            {% if newsletter_form.email.errors %}
+                                <div class="alert alert-danger mt-2" role="alert">
+                                    {{ newsletter_form.email.errors }}
+                                </div>
+                            {% endif %}
                         </div>
-                        <button type="submit" name="newsletter_subscribe" class="btn btn-info btn-block">Subscribe</button>
+                        <button type="submit" class="btn btn-info btn-block">Subscribe</button>
                     </form>
                     <small class="form-text text-muted">Join {{ subscriber_count }} readers and never miss a story.</small>
                 </div>

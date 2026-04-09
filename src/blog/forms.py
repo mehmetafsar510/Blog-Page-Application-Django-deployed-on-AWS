@@ -59,16 +59,25 @@ class CommentForm(forms.ModelForm):
 
 
 class NewsletterSubscriptionForm(forms.ModelForm):
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'your@email.com',
+            'autocomplete': 'email',
+            'type': 'email'
+        })
+    )
+    
     class Meta:
         model = NewsletterSubscriber
         fields = ('email',)
-        widgets = {
-            'email': forms.EmailInput(attrs={
-                'class': 'form-control',
-                'placeholder': 'Enter your email',
-                'autocomplete': 'email'
-            })
-        }
         labels = {
-            'email': 'Email Address'
+            'email': ''
         }
+    
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            email = email.strip().lower()
+        return email

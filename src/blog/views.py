@@ -14,8 +14,9 @@ from django.utils.text import slugify
 
 
 def post_list(request):
-    newsletter_form = NewsletterSubscriptionForm(request.POST or None)
-    if request.method == "POST" and 'newsletter_subscribe' in request.POST:
+    newsletter_form = NewsletterSubscriptionForm()
+    if request.method == "POST" and 'email' in request.POST:
+        newsletter_form = NewsletterSubscriptionForm(request.POST)
         if newsletter_form.is_valid():
             email = newsletter_form.cleaned_data['email'].strip().lower()
             subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
@@ -29,11 +30,15 @@ def post_list(request):
                         fail_silently=False,
                     )
                     messages.success(request, "Subscribed successfully! A welcome email is on its way.")
-                except Exception:
-                    messages.success(request, "Subscribed successfully! We were unable to send the welcome email due to mail settings.")
+                except Exception as e:
+                    messages.success(request, "Subscribed successfully!")
             else:
                 messages.info(request, "You are already subscribed to the newsletter.")
             return redirect('blog:list')
+        else:
+            for field, errors in newsletter_form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{error}")
     
     qs = Post.objects.filter(status='p').filter(
         Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
@@ -105,22 +110,34 @@ def robots(request):
 
 @login_required()
 def post_create(request):
-    # form = PostForm(request.POST or None, request.FILES or None)
-
     form = PostForm()
     if request.method == "POST":
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
-            # Generate slug from title
-            post.slug = slugify(post.title)
+            # Generate slug from title with uniqueness check
+            base_slug = slugify(post.title)
+            slug = base_slug
+            counter = 1
+            while Post.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            post.slug = slug
+            # Set published_date if status is published
             if post.status == 'p' and not post.published_date:
                 post.published_date = timezone.now()
-            post.save()
-            form.save_m2m()  # Save tags
-            messages.success(request, "Post created succesfully!")
-            return redirect("blog:list")
+            try:
+                post.save()
+                form.save_m2m()  # Save tags
+                messages.success(request, "Post created successfully!")
+                return redirect("blog:list")
+            except Exception as e:
+                messages.error(request, f"Error creating post: {str(e)}")
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     context = {
         'form': form
     }
