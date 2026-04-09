@@ -14,6 +14,10 @@ def post_list(request):
     return render(request, "blog/post_list.html", context)
 
 
+def about(request):
+    return render(request, "about.html")
+
+
 @login_required()
 def post_create(request):
     # form = PostForm(request.POST or None, request.FILES or None)
