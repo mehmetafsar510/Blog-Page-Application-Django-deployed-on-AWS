@@ -179,6 +179,8 @@ STATICFILES_DIRS = [
 #STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 #DEFAULT_FILE_STORAGE = 'cblog.storages.MediaStore'
 
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+os.makedirs(LOG_DIR, exist_ok=True)
 
 # Logging configuration
 LOGGING = {
