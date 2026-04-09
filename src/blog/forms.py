@@ -15,7 +15,11 @@ class SearchForm(forms.Form):
 
 
 class PostForm(forms.ModelForm):
-    status = forms.ChoiceField(choices=Post.OPTIONS)
+    status = forms.ChoiceField(
+        choices=Post.OPTIONS,
+        initial='p',  # Default to Published
+        widget=forms.RadioSelect
+    )
     category = forms.ChoiceField(choices=Post.CATEGORY_OPT)
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
