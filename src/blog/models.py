@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 
 
@@ -40,6 +42,7 @@ class Post(models.Model):
         upload_to=user_directory_path, default='django.jpg')
     category = models.CharField(max_length=15, choices=CATEGORY_OPT, default='e')
     publish_date = models.DateTimeField(auto_now_add=True)
+    published_date = models.DateTimeField(blank=True, null=True, help_text="Set a publish date for scheduled posts")
     last_updated = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=10, choices=OPTIONS, default='d')
@@ -54,6 +57,15 @@ class Post(models.Model):
     def __str__(self):
         return self.title
     
+    def get_absolute_url(self):
+        return reverse('blog:detail', kwargs={'slug': self.slug})
+
+    def is_published(self):
+        return self.status == 'p' and (self.published_date is None or self.published_date <= timezone.now())
+
+    def get_published_date(self):
+        return self.published_date if self.published_date else self.publish_date
+
     def get_meta_title(self):
         return self.meta_title if self.meta_title else self.title
     

@@ -1,11 +1,12 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import register, profile, contact, follow_user, unfollow_user
+from .views import register, profile, view_profile, contact, follow_user, unfollow_user
 from .forms import PasswordResetEmailCheck
 
 urlpatterns = [
     path("register/", register, name="register"),
     path("profile/", profile, name="profile"),
+    path("author/<str:username>/", view_profile, name="author-profile"),
     path("contact/", contact, name="contact"),
     path("follow/<int:user_id>/", follow_user, name="follow"),
     path("unfollow/<int:user_id>/", unfollow_user, name="unfollow"),

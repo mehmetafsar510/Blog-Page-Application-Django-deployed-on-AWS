@@ -21,6 +21,11 @@ class PostForm(forms.ModelForm):
         widget=forms.RadioSelect
     )
     category = forms.ChoiceField(choices=Post.CATEGORY_OPT)
+    published_date = forms.DateTimeField(
+        required=False,
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        help_text='Optional publish date for scheduling'
+    )
     tags = forms.ModelMultipleChoiceField(
         queryset=Tag.objects.all(),
         required=False,
@@ -35,6 +40,7 @@ class PostForm(forms.ModelForm):
             'image',
             'category',
             'status',
+            'published_date',
             'tags',
             'meta_title',
             'meta_description',

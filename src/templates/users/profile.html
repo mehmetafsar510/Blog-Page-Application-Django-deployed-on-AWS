@@ -7,32 +7,32 @@
         <!-- Profile Card -->
         <div class="col-md-4">
             <div class="card">
-                <img src="{{ user.profile.image.url }}" class="card-img-top" alt="profile_image" style="height: 300px; object-fit: cover;">
+                <img src="{{ profile_user.profile.image.url }}" class="card-img-top" alt="profile_image" style="height: 300px; object-fit: cover;">
                 <div class="card-body text-center">
-                    <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
-                    <p class="text-muted">@{{ user.username }}</p>
-                    <p class="card-text">{{ user.profile.bio }}</p>
+                    <h5 class="card-title">{{ profile_user.get_full_name|default:profile_user.username }}</h5>
+                    <p class="text-muted">@{{ profile_user.username }}</p>
+                    <p class="card-text">{{ profile_user.profile.bio }}</p>
                     
                     <!-- User Stats -->
                     <div class="row mb-3">
                         <div class="col-6">
                             <h6>Posts</h6>
-                            <p class="h5">{{ user.post_set.all.count }}</p>
+                            <p class="h5">{{ profile_user.post_set.count }}</p>
                         </div>
                         <div class="col-6">
                             <h6>Followers</h6>
-                            <p class="h5">{{ user.profile.follower_count }}</p>
+                            <p class="h5">{{ profile_user.profile.follower_count }}</p>
                         </div>
                     </div>
                     
                     <!-- Follow/Unfollow & Edit Button -->
-                    {% if user == request.user %}
+                    {% if profile_user == request.user %}
                         <a href="#editProfile" class="btn btn-primary btn-sm btn-block" data-toggle="collapse">Edit Profile</a>
                     {% else %}
-                        {% if request.user in user.profile.followers.all %}
-                            <a href="{% url 'unfollow' user.id %}" class="btn btn-secondary btn-sm btn-block">Unfollow</a>
+                        {% if request.user in profile_user.profile.followers.all %}
+                            <a href="{% url 'unfollow' profile_user.id %}" class="btn btn-secondary btn-sm btn-block">Unfollow</a>
                         {% else %}
-                            <a href="{% url 'follow' user.id %}" class="btn btn-primary btn-sm btn-block">Follow</a>
+                            <a href="{% url 'follow' profile_user.id %}" class="btn btn-primary btn-sm btn-block">Follow</a>
                         {% endif %}
                     {% endif %}
                 </div>
@@ -41,7 +41,7 @@
 
         <!-- Edit Profile Form -->
         <div class="col-md-8">
-            {% if user == request.user %}
+            {% if profile_user == request.user %}
             <div class="collapse" id="editProfile">
                 <div class="card card-body">
                     <h5>Edit Your Profile</h5>
@@ -58,10 +58,10 @@
             <!-- User Posts -->
             <div class="card mt-3">
                 <div class="card-header">
-                    <h5 class="mb-0">{{ user.username }}'s Posts</h5>
+                    <h5 class="mb-0">{{ profile_user.username }}'s Posts</h5>
                 </div>
                 <div class="card-body">
-                    {% for post in user.post_set.all %}
+                    {% for post in user_posts %}
                     <div class="mb-3 pb-3 border-bottom">
                         <h6><a href="{% url 'blog:detail' post.slug %}">{{ post.title }}</a></h6>
                         <small class="text-muted">{{ post.publish_date|date:"M d, Y" }} - 
@@ -76,13 +76,30 @@
                 </div>
             </div>
 
+            <!-- Top Posts -->
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Top Posts</h5>
+                </div>
+                <div class="card-body">
+                    {% for post in top_posts %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <h6><a href="{% url 'blog:detail' post.slug %}">{{ post.title }}</a></h6>
+                        <small class="text-muted"><i class="fas fa-eye"></i> {{ post.view_count }} views</small>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted">No top posts yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
             <!-- Followers List -->
             <div class="card mt-3">
                 <div class="card-header">
-                    <h5 class="mb-0">Followers ({{ user.profile.follower_count }})</h5>
+                    <h5 class="mb-0">Followers ({{ profile_user.profile.follower_count }})</h5>
                 </div>
                 <div class="card-body">
-                    {% for follower in user.profile.followers.all %}
+                    {% for follower in profile_user.profile.followers.all %}
                     <div class="mb-2 pb-2 border-bottom">
                         <strong>{{ follower.username }}</strong>
                         {% if follower != request.user %}

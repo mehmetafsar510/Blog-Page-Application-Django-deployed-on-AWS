@@ -1,4 +1,4 @@
-# from django.http.response import HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Post, Like, PostView, Tag
 from .forms import CommentForm, PostForm, SearchForm
@@ -6,11 +6,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
+from django.utils import timezone
 from django.utils.text import slugify
 
 
 def post_list(request):
-    qs = Post.objects.filter(status='p').order_by('-publish_date')
+    qs = Post.objects.filter(status='p').filter(
+        Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
+    ).order_by('-published_date')
     search_form = SearchForm(request.GET or None)
     category = request.GET.get('category')
     tag = request.GET.get('tag')
@@ -34,10 +37,14 @@ def post_list(request):
     page_obj = paginator.get_page(page_number)
     
     # Recent posts (sidebar widget)
-    recent_posts = Post.objects.filter(status='p').order_by('-publish_date')[:5]
+    recent_posts = Post.objects.filter(status='p').filter(
+        Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
+    ).order_by('-published_date')[:5]
     
     # Popular posts (sidebar widget) - annotate view count
-    popular_posts = Post.objects.filter(status='p').annotate(
+    popular_posts = Post.objects.filter(status='p').filter(
+        Q(published_date__lte=timezone.now()) | Q(published_date__isnull=True)
+    ).annotate(
         view_count=Count('postview')
     ).order_by('-view_count')[:5]
     
@@ -56,6 +63,11 @@ def about(request):
     return render(request, "about.html")
 
 
+def robots(request):
+    content = "User-agent: *\nDisallow:\nSitemap: {}/sitemap.xml\n".format(request.scheme + "://" + request.get_host())
+    return HttpResponse(content, content_type="text/plain")
+
+
 @login_required()
 def post_create(request):
     # form = PostForm(request.POST or None, request.FILES or None)
@@ -68,6 +80,8 @@ def post_create(request):
             post.author = request.user
             # Generate slug from title
             post.slug = slugify(post.title)
+            if post.status == 'p' and not post.published_date:
+                post.published_date = timezone.now()
             post.save()
             form.save_m2m()  # Save tags
             messages.success(request, "Post created succesfully!")
@@ -111,7 +125,11 @@ def post_update(request, slug):
         messages.warning(request, "You're not a writer of this post")
         return redirect('blog:list')
     if form.is_valid():
-        form.save()
+        post = form.save(commit=False)
+        if post.status == 'p' and not post.published_date:
+            post.published_date = timezone.now()
+        post.save()
+        form.save_m2m()
         messages.success(request, "Post updated!!")
         return redirect("blog:list")
 

@@ -19,6 +19,30 @@
     <meta property="twitter:title" content="{{ object.get_meta_title }}">
     <meta property="twitter:description" content="{{ object.get_meta_description }}">
     <meta property="twitter:image" content="{{ object.image.url }}">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ object.get_meta_title|escapejs }}",
+      "image": ["{{ request.build_absolute_uri }}"],
+      "datePublished": "{{ object.get_published_date|date:'c' }}",
+      "dateModified": "{{ object.last_updated|date:'c' }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ object.author.get_full_name|default:object.author.username|escapejs }}"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "DJ Blog",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "{{ request.build_absolute_uri }}"
+        }
+      },
+      "description": "{{ object.get_meta_description|escapejs }}"
+    }
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -31,8 +55,8 @@
         <div class="d-flex align-items-center mb-3">
             <img src="{{ object.author.profile.image.url }}" alt="author" class="rounded-circle mr-3" style="width: 50px; height: 50px; object-fit: cover;">
             <div>
-                <h6 class="mb-0"><a href="{% url 'profile' %}">{{ object.author.get_full_name|default:object.author.username }}</a></h6>
-                <small class="text-muted">{{ object.publish_date|date:"M d, Y" }} • {{ object.get_reading_time }} min read</small>
+                <h6 class="mb-0"><a href="{% url 'author-profile' object.author.username %}">{{ object.author.get_full_name|default:object.author.username }}</a></h6>
+                <small class="text-muted">{{ object.get_published_date|date:"M d, Y" }} • {{ object.get_reading_time }} min read</small>
                 {% if object.author.profile.bio %}
                 <p class="mb-0 mt-1 small">{{ object.author.profile.bio|truncatechars:150 }}</p>
                 {% endif %}

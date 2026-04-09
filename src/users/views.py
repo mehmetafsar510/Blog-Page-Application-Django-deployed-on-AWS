@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib.auth.models import User
+from django.db.models import Count
 from .forms import RegistrationForm, UserUpdateForm, ProfileUpdateForm, ContactForm
 from django.core.mail import send_mail
 from django.conf import settings
@@ -68,9 +69,26 @@ def profile(request):
 
     context = {
         "u_form": u_form,
-        "p_form": p_form
+        "p_form": p_form,
+        "profile_user": request.user,
+        "user_posts": request.user.post_set.filter(status='p')[:5],
+        "top_posts": request.user.post_set.filter(status='p').annotate(
+            view_count=Count('postview')
+        ).order_by('-view_count')[:3],
     }
 
+    return render(request, "users/profile.html", context)
+
+
+def view_profile(request, username):
+    profile_user = get_object_or_404(User, username=username)
+    context = {
+        "profile_user": profile_user,
+        "user_posts": profile_user.post_set.filter(status='p')[:5],
+        "top_posts": profile_user.post_set.filter(status='p').annotate(
+            view_count=Count('postview')
+        ).order_by('-view_count')[:3],
+    }
     return render(request, "users/profile.html", context)
 
 
