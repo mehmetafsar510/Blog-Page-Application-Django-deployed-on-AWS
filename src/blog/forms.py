@@ -32,7 +32,14 @@ class PostForm(forms.ModelForm):
             'category',
             'status',
             'tags',
+            'meta_title',
+            'meta_description',
+            'keywords',
         )
+        widgets = {
+            'meta_description': forms.Textarea(attrs={'rows': 3, 'maxlength': 160}),
+            'keywords': forms.TextInput(attrs={'placeholder': 'keyword1, keyword2, keyword3'}),
+        }
 
 
 class CommentForm(forms.ModelForm):

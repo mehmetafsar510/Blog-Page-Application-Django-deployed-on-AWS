@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 
 def user_directory_path(instance, filename):
@@ -44,10 +45,36 @@ class Post(models.Model):
     status = models.CharField(max_length=10, choices=OPTIONS, default='d')
     slug = models.SlugField(blank=True, unique=True)  # how-to-learn-django
     tags = models.ManyToManyField(Tag, blank=True, related_name='posts')
+    
+    # SEO fields
+    meta_title = models.CharField(max_length=200, blank=True, help_text="SEO title (if different from post title)")
+    meta_description = models.TextField(blank=True, help_text="SEO description (150-160 characters)")
+    keywords = models.CharField(max_length=500, blank=True, help_text="Comma-separated keywords")
 
     def __str__(self):
         return self.title
-
+    
+    def get_meta_title(self):
+        return self.meta_title if self.meta_title else self.title
+    
+    def get_meta_description(self):
+        if self.meta_description:
+            return self.meta_description
+        return self.content[:160] + "..." if len(self.content) > 160 else self.content
+    
+    def get_reading_time(self):
+        word_count = len(self.content.split())
+        # Average reading speed: 200 words per minute
+        minutes = word_count // 200
+        return max(1, minutes)  # At least 1 minute
+    
+    def get_related_posts(self):
+        # Get posts with same tags or category
+        related = Post.objects.filter(
+            models.Q(tags__in=self.tags.all()) | models.Q(category=self.category)
+        ).exclude(id=self.id).distinct()[:3]
+        return related
+    
     def comment_count(self):
         return self.comment_set.all().count()
 

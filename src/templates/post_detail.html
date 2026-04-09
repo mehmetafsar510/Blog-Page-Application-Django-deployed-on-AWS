@@ -1,11 +1,43 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+
+{% block title %}{{ object.get_meta_title }}{% endblock %}
+
+{% block meta_description %}{{ object.get_meta_description }}{% endblock %}
+
+{% block extra_head %}
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:title" content="{{ object.get_meta_title }}">
+    <meta property="og:description" content="{{ object.get_meta_description }}">
+    <meta property="og:image" content="{{ object.image.url }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
+    <meta property="twitter:title" content="{{ object.get_meta_title }}">
+    <meta property="twitter:description" content="{{ object.get_meta_description }}">
+    <meta property="twitter:image" content="{{ object.image.url }}">
+{% endblock %}
+
 {% block content %}
 <div class="container card" style="width: 40rem;">
     <img src="{{ object.image.url }}" class="card-img-top" alt="post_image">
     <div class="card-body">
         <h2 class="card-title">{{ object.title }}</h2>
-        <p class="text-muted">By <strong>{{ object.author.username }}</strong> | {{ object.publish_date|date:"M d, Y" }}</p>
+        
+        <!-- Author Info -->
+        <div class="d-flex align-items-center mb-3">
+            <img src="{{ object.author.profile.image.url }}" alt="author" class="rounded-circle mr-3" style="width: 50px; height: 50px; object-fit: cover;">
+            <div>
+                <h6 class="mb-0"><a href="{% url 'profile' %}">{{ object.author.get_full_name|default:object.author.username }}</a></h6>
+                <small class="text-muted">{{ object.publish_date|date:"M d, Y" }} • {{ object.get_reading_time }} min read</small>
+                {% if object.author.profile.bio %}
+                <p class="mb-0 mt-1 small">{{ object.author.profile.bio|truncatechars:150 }}</p>
+                {% endif %}
+            </div>
+        </div>
         
         <!-- Tags -->
         {% if object.tags.all %}
@@ -29,13 +61,13 @@
         <!-- Social Sharing Buttons -->
         <div class="my-3">
             <strong>Share:</strong>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=http://yoursite.com/{{ object.slug }}/" target="_blank" class="btn btn-sm btn-primary">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="btn btn-sm btn-primary">
                 <i class="fab fa-facebook"></i> Facebook
             </a>
-            <a href="https://twitter.com/intent/tweet?url=http://yoursite.com/{{ object.slug }}&text={{ object.title }}" target="_blank" class="btn btn-sm btn-info">
+            <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ object.title }}" target="_blank" class="btn btn-sm btn-info">
                 <i class="fab fa-twitter"></i> Twitter
             </a>
-            <a href="https://www.linkedin.com/sharing/share-offsite/?url=http://yoursite.com/{{ object.slug }}" target="_blank" class="btn btn-sm btn-secondary">
+            <a href="https://www.linkedin.com/sharing/share-offsite/?url={{ request.build_absolute_uri }}" target="_blank" class="btn btn-sm btn-secondary">
                 <i class="fab fa-linkedin"></i> LinkedIn
             </a>
         </div>
@@ -79,6 +111,26 @@
         </div>
 
     </div>
+
+    <!-- Related Posts -->
+    {% if object.get_related_posts %}
+    <div class="card-footer">
+        <h5>Related Posts</h5>
+        <div class="row">
+            {% for related_post in object.get_related_posts %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <img src="{{ related_post.image.url }}" class="card-img-top" alt="related post" style="height: 150px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <h6 class="card-title"><a href="{% url 'blog:detail' related_post.slug %}">{{ related_post.title }}</a></h6>
+                        <small class="text-muted">{{ related_post.publish_date|timesince }} ago</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
     <div class="m-3">
         {% if user.id == object.author.id %}

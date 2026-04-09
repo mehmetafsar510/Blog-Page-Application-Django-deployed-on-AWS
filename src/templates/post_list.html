@@ -122,6 +122,25 @@
                 </div>
             </div>
 
+            <!-- Popular Posts Widget -->
+            <div class="card shadow mb-4">
+                <div class="card-header bg-warning text-white">
+                    <h5 class="mb-0"><i class="fas fa-star"></i> Popular Posts</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for post in popular_posts %}
+                        <li class="list-group-item">
+                            <a href="{% url 'blog:detail' post.slug %}">{{ post.title }}</a>
+                            <small class="text-muted d-block"><i class="fas fa-eye"></i> {{ post.view_count }} views</small>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No popular posts</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+
             <!-- Categories Widget -->
             <div class="card shadow mb-4">
                 <div class="card-header bg-success text-white">

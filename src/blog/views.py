@@ -35,12 +35,16 @@ def post_list(request):
     # Recent posts (sidebar widget)
     recent_posts = Post.objects.filter(status='p').order_by('-publish_date')[:5]
     
+    # Popular posts (sidebar widget)
+    popular_posts = Post.objects.filter(status='p').order_by('-view_count')[:5]
+    
     context = {
         "object_list": page_obj,
         "search_form": search_form,
         "selected_category": category,
         "selected_tag": tag,
         "recent_posts": recent_posts,
+        "popular_posts": popular_posts,
     }
     return render(request, "blog/post_list.html", context)
 

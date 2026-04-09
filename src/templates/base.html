@@ -12,7 +12,10 @@
         integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static 'blog/main.css' %}">
 
-    <title>DJ Blog</title>
+    <title>{% block title %}DJ Blog{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}A Django blog application{% endblock %}">
+    
+    {% block extra_head %}{% endblock %}
 </head>
 
 <body>

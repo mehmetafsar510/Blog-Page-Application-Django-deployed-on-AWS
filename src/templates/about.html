@@ -8,6 +8,15 @@
         <hr class="my-4">
         <p>Use this page to describe your project, your team, or the purpose of the application.</p>
         <p>Users can create posts, comment, like, and upload images.</p>
+        
+        <h4>RSS Feed Nedir?</h4>
+        <p>RSS (Really Simple Syndication), blog yazılarını otomatik takip etmek için kullanılan bir teknolojidir.</p>
+        <ul>
+            <li><strong>Nasıl kullanılır?</strong> RSS okuyucu uygulamalara (Feedly, Inoreader) feed URL'sini ekleyin</li>
+            <li><strong>Feed URL:</strong> <code>{% url 'blog:feed' %}</code></li>
+            <li><strong>Yararları:</strong> Yeni yazılar yayınlandığında otomatik bildirim alın</li>
+        </ul>
+        <p><a href="{% url 'blog:feed' %}" class="btn btn-info">RSS Feed'e Abone Ol</a></p>
     </div>
 </div>
 {% endblock content %}
