@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -168,7 +168,7 @@ STATICFILES_DIRS = [
 #AWS_STORAGE_BUCKET_NAME = 'capstone-django' # please enter your s3 bucket name
 #AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
 #AWS_S3_REGION_NAME = 'please enter your s3 region' # please enter your s3 region 
-#AWS_DEFAULT_ACL = 'public-read'
+#AWS_DEFAULT_ACL = 'public-read' 
 
 #AWS_LOCATION = 'static'
 #STATICFILES_DIRS = [
@@ -178,3 +178,45 @@ STATICFILES_DIRS = [
 #STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)
 #STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 #DEFAULT_FILE_STORAGE = 'cblog.storages.MediaStore'
+
+
+# Logging configuration
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs', 'django_error.log'),
+            'formatter': 'verbose',
+        },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
